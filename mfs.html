@@ -1,0 +1,463 @@
+
+<html>
+<head>
+    
+    <title>Gravitational Wave Detection Simulation</title>
+    <style>
+        body 
+        {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background:linear-gradient(to right, #ec0606,#fce0e0);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        } 
+
+        .controls 
+        {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .controls:hover 
+        {
+            transform: scale(1.05);
+        }
+
+        .control-group 
+        {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .control-group label 
+        {
+            flex: 1;
+            font-size: 1.1em;
+        }
+
+        .control-group input[type="range"] {
+            flex: 3;
+            margin: 0 10px;
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb 
+        {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb 
+        {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .range-label 
+        {
+            flex: 1;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        canvas {
+            display: block; 
+            border: 2px solid #333;
+            background-color: white;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        canvas:hover 
+        {
+            transform: scale(1.02);
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+
+        button:hover 
+        {
+            background: #45a049;
+        }
+
+        button:active 
+        {
+            transform: scale(0.98);
+        }
+
+        .theory-section 
+        {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            max-width: 800px;
+        }
+
+        .theory-section h2 
+        {
+            margin-top: 0;
+        }
+
+        .theory-section p 
+        {
+            margin: 10px 0;
+        }
+
+        .graph-controls 
+        {
+            display: none;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .graph-controls button 
+        {
+            margin: 0 10px;
+        }
+        
+        h1 
+        {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 3.5em;
+            color: #333; /* Dark color for better readability */
+            text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            background: linear-gradient(to right, #4ecdc4, #556270);
+            -webkit-background-clip: text; /* Clip text to the background */
+            -webkit-text-fill-color: transparent; /* Make text transparent */
+            animation: gradient-animation 8s ease infinite;
+        }
+
+        @keyframes gradient-animation 
+        {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Gravitational Wave Detection Simulation</h1>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="frequency">Frequency:</label>
+            <input type="range" id="frequency" name="frequency" min="1.13" max="5.21" step="0.01" value="1.59">
+            <span id="frequencyValue" class="range-label">1.59</span> Hz
+        </div>
+        <div class="control-group">
+            <label for="amplitude">Amplitude:</label>
+            <input type="range" id="amplitude" name="amplitude" min="1.22" max="8.97" step="0.01" value="8.09">
+            <span id="amplitudeValue" class="range-label">8.09</span> units
+        </div>
+        <div class="control-group">
+            <label for="noise">Noise Level:</label>
+            <input type="range" id="noise" name="noise" min="3.47" max="3.51" step="0.01" value="3.47">
+            <span id="noiseValue" class="range-label">3.47</span> units
+        </div>
+        <div class="control-group">
+            <label for="phaseShift">Phase Shift:</label>
+            <input type="range" id="phaseShift" name="phaseShift" min="1.04" max="4.11" step="0.01" value="3.82">
+            <span id="phaseShiftValue" class="range-label">3.82</span> rad
+        </div>
+        <div class="control-group">
+            <label for="armLength">Arm Length:</label>
+            <input type="range" id="armLength" name="armLength" min="100" max="400" step="10" value="200">
+            <span id="armLengthValue" class="range-label">200</span> units
+        </div>
+        <div class="control-group">
+            <label for="dataPoints">Data Points:</label>
+            <input type="range" id="dataPoints" name="dataPoints" min="100" max="800" step="50" value="800">
+            <span id="dataPointsValue" class="range-label">800</span>
+        </div>
+        <button id="simulateBtn">Simulate</button>
+        <button id="toggleTheoryBtn">Show Theoretical Background</button>
+        <button id="toggleGraphBtn">Show Graph</button>
+    </div>
+    <canvas id="gwCanvas" width="800" height="400"></canvas>
+    <canvas id="graphCanvas" width="800" height="200" style="display: none;"></canvas>
+
+    <div class="graph-controls" id="graphControls">
+        <button id="zoomInBtn">Zoom In</button>
+        <button id="zoomOutBtn">Zoom Out</button>
+        <button id="pauseBtn">Pause</button>
+    </div>
+
+    <div class="theory-section" id="theorySection">
+        <h2>Theoretical Background</h2>
+        <h3>General Relativity</h3>
+        <p>Albert Einstein's theory of general relativity predicts that massive objects cause a distortion in space-time, which is felt as gravity. When massive objects accelerate, they can create ripples in space-time known as gravitational waves.</p>
+        
+        <h3>Gravitational Waves</h3>
+        <p>Gravitational waves are ripples in the fabric of space-time caused by some of the most violent and energetic processes in the universe, such as colliding black holes or neutron stars. These waves travel at the speed of light and can be detected by measuring the tiny changes they cause in the distance between objects.</p>
+        
+        <h3>Interferometers</h3>
+        <p>Interferometers are precise measuring instruments used to detect gravitational waves. They work by splitting a laser beam into two perpendicular arms, reflecting them back and recombining them. Gravitational waves cause tiny changes in the length of these arms, which can be measured by observing the interference pattern of the recombined laser beam.</p        <h3>Noise and Signal Processing</h3>
+        <p>Noise in the context of gravitational wave detection refers to unwanted signals that can obscure the detection of gravitational waves. Various sources of noise, such as seismic activity, thermal fluctuations, and instrumental noise, need to be filtered out through sophisticated signal processing techniques.</p>
+        
+        <h3>Amplitude and Frequency</h3>
+        <p>The amplitude of a gravitational wave represents the strength of the wave, while the frequency represents how often the wave oscillates. By studying these properties, scientists can learn about the events that produced the gravitational waves, such as the masses and velocities of colliding black holes.</p>
+        
+        <h3>Phase Shift</h3>
+        <p>The phase shift in a gravitational wave signal refers to the change in the wave's phase shift, which can provide information about the relative position.</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const canvas = document.getElementById('gwCanvas');
+            const ctx = canvas.getContext('2d');
+            const graphCanvas = document.getElementById('graphCanvas');
+            const graphCtx = graphCanvas.getContext('2d');
+            const center = { x: canvas.width / 2, y: canvas.height / 2 };
+            const mirrorSize = 20;
+            let frequency = parseFloat(document.getElementById('frequency').value);
+            let amplitude = parseFloat(document.getElementById('amplitude').value);
+            let noiseLevel = parseFloat(document.getElementById('noise').value);
+            let phaseShift = parseFloat(document.getElementById('phaseShift').value);
+            let armLength = parseFloat(document.getElementById('armLength').value);
+            let dataPointsLimit = parseFloat(document.getElementById('dataPoints').value);
+            let time = 0;
+            let dataPoints = [];
+            let isGraphPaused = false;
+            let graphAnimationId;
+            let interferometerAnimationId;
+            let graphZoomFactor = 1;
+
+            document.querySelectorAll('.controls input[type="range"]').forEach(input => {
+                input.addEventListener('input', updateValue);
+            });
+
+            document.getElementById('simulateBtn').addEventListener('click', () => {
+                startSimulation();
+            });
+
+            document.getElementById('zoomInBtn').addEventListener('click', () => {
+                graphZoomFactor *= 1.1;
+                drawGraph();
+            });
+
+            document.getElementById('zoomOutBtn').addEventListener('click', () => {
+                graphZoomFactor /= 1.1;
+                drawGraph();
+            });
+
+            document.getElementById('pauseBtn').addEventListener('click', () => {
+                if (isGraphPaused) {
+                    isGraphPaused = false;
+                    document.getElementById('pauseBtn').innerText = 'Pause';
+                    animateInterferometer(); // Resume animation
+                } else {
+                    isGraphPaused = true;
+                    document.getElementById('pauseBtn').innerText = 'Resume';
+                    cancelAnimationFrame(graphAnimationId); // Pause animation
+                }
+            });
+
+            document.getElementById('toggleTheoryBtn').addEventListener('click', () => {
+                const theorySection = document.getElementById('theorySection');
+                if (theorySection.style.display === 'none' || theorySection.style.display === '') {
+                    theorySection.style.display = 'block';
+                    document.getElementById('toggleTheoryBtn').innerText = 'Hide Theoretical Background';
+                } else {
+                    theorySection.style.display = 'none';
+                    document.getElementById('toggleTheoryBtn').innerText = 'Show Theoretical Background';
+                }
+            });
+
+            document.getElementById('toggleGraphBtn').addEventListener('click', () => {
+                const graphCanvas = document.getElementById('graphCanvas');
+                const graphControls = document.getElementById('graphControls');
+                if (graphCanvas.style.display === 'none' || graphCanvas.style.display === '') {
+                    graphCanvas.style.display = 'block';
+                    graphControls.style.display = 'flex';
+                    document.getElementById('toggleGraphBtn').innerText = 'Hide Graph';
+                    
+                    if (!isGraphPaused) {
+                        startSimulation();
+                    }
+                } else {
+                    graphCanvas.style.display = 'none';
+                    graphControls.style.display = 'none';
+                    document.getElementById('toggleGraphBtn').innerText = 'Show Graph';
+                   
+                    isGraphPaused = true;
+                    cancelAnimationFrame(graphAnimationId);
+                }
+            });
+
+            function updateValue(e) {
+                const id = e.target.id;
+                const value = parseFloat(e.target.value).toFixed(2);
+                document.getElementById(`${id}Value`).innerText = value;
+                if (id === 'frequency') frequency = parseFloat(value);
+                if (id === 'amplitude') amplitude = parseFloat(value);
+                if (id === 'noise') noiseLevel = parseFloat(value);
+                if (id === 'phaseShift') phaseShift = parseFloat(value);
+                if (id === 'armLength') armLength = parseFloat(value);
+                if (id === 'dataPoints') dataPointsLimit = parseFloat(value);
+            }
+
+            function generateNoise() {
+                return (Math.random() - 0.5) * noiseLevel;
+            }
+
+            function generateGravitationalWave() {
+                return amplitude * Math.sin(2 * Math.PI * frequency * time + phaseShift) + generateNoise();
+            }
+
+            function drawInterferometer(displacement) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                
+                ctx.beginPath();
+                ctx.arc(center.x, center.y, armLength + mirrorSize, 0, Math.PI * 2);
+                ctx.strokeStyle = 'gray';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.closePath();
+
+               
+                ctx.beginPath();
+                ctx.arc(center.x, center.y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = 'black';
+                ctx.fill();
+                ctx.closePath();
+
+          
+                const arm1EndX = center.x + armLength + displacement;
+                const arm1EndY = center.y;
+
+                const arm2EndX = center.x;
+                const arm2EndY = center.y + armLength - displacement;
+
+                
+                ctx.beginPath();
+                ctx.moveTo(center.x, center.y);
+                ctx.lineTo(arm1EndX, arm1EndY);
+                ctx.strokeStyle = 'blue';
+                ctx.lineWidth = 5;
+                ctx.stroke();
+                ctx.closePath();
+
+                ctx.beginPath();
+                ctx.moveTo(center.x, center.y);
+                ctx.lineTo(arm2EndX, arm2EndY);
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 5;
+                ctx.stroke();
+                ctx.closePath();
+
+              
+                drawMirror(arm1EndX, arm1EndY, 'blue');
+                drawMirror(arm2EndX, arm2EndY, 'red');
+            }
+
+            function drawMirror(x, y, color) {
+                ctx.beginPath();
+                ctx.arc(x, y, mirrorSize / 2, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            function drawGraph() {
+                graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+
+               
+                graphCtx.beginPath();
+                graphCtx.moveTo(0, graphCanvas.height / 2);
+                graphCtx.lineTo(graphCanvas.width, graphCanvas.height / 2); // x axis
+                graphCtx.moveTo(graphCanvas.width / 2, 0);
+                graphCtx.lineTo(graphCanvas.width / 2, graphCanvas.height); // y axis
+                graphCtx.strokeStyle = 'gray';
+                graphCtx.lineWidth = 1;
+                graphCtx.stroke();
+                graphCtx.closePath();
+
+                graphCtx.beginPath();
+                graphCtx.moveTo(0, graphCanvas.height / 2);
+
+                dataPoints.forEach((point, index) => {
+                    const x = index * (graphCanvas.width / dataPointsLimit) * graphZoomFactor;
+                    const y = graphCanvas.height / 2 - point * graphZoomFactor;
+                    graphCtx.lineTo(x, y);
+                    
+                    if (index % 10 === 0) {
+                        graphCtx.fillText(point.toFixed(2), x, y - 5);
+                    }
+                });
+
+                graphCtx.strokeStyle = 'black';
+                graphCtx.lineWidth = 2;
+                graphCtx.stroke();
+                graphCtx.closePath();
+            }
+
+            function animateInterferometer() {
+                const displacement = generateGravitationalWave();
+                drawInterferometer(displacement);
+                time += 1 / 60;
+                dataPoints.push(displacement);
+                if (dataPoints.length > dataPointsLimit) dataPoints.shift();
+                if (!isGraphPaused) {
+                    graphAnimationId = requestAnimationFrame(animateInterferometer);
+                    drawGraph();
+                }
+            }
+
+            function startSimulation() {
+             
+                time = 0;
+                dataPoints.length = 0;
+                isGraphPaused = false;
+                animateInterferometer();
+            }
+
+            
+            startSimulation();
+        });
+    </script>
+</body>
+</html>
